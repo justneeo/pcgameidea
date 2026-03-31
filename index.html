@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e0e0e">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RED Network</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --card: #161618;
+    --rose: #e8a4a4;
+    --rose-soft: rgba(232,164,164,0.12);
+    --rose-glow: rgba(232,164,164,0.25);
+    --gold: #d4a853;
+    --gold-soft: rgba(212,168,83,0.12);
+    --text: #e8e4df;
+    --muted: #8a8680;
+    --white: #f5f0eb;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .noise {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .glow-top {
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(ellipse, var(--rose-glow) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 28px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── LANG TOGGLE ── */
+  .lang-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .lang-btn {
+    background: transparent;
+    border: 1px solid rgba(232,164,164,0.12);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0;
+  }
+
+  .lang-btn:first-child { border-radius: 20px 0 0 20px; }
+  .lang-btn:last-child { border-radius: 0 20px 20px 0; }
+
+  .lang-btn.active {
+    background: var(--rose-soft);
+    border-color: var(--rose);
+    color: var(--rose);
+  }
+
+  .lang-btn:not(.active):hover {
+    border-color: rgba(232,164,164,0.3);
+    color: var(--text);
+  }
+
+  /* ── HEADER ── */
+  .brand {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeUp 1s ease both;
+  }
+
+  .brand-block {
+    display: inline-block;
+    text-align: right;
+  }
+
+  .brand-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: var(--rose);
+    letter-spacing: 0.15em;
+    margin-bottom: 0;
+    line-height: 1;
+    text-align: right;
+  }
+
+  .brand-sub {
+    font-size: 0.72rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--white);
+    font-weight: 400;
+    margin-top: 2px;
+    text-align: right;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeUp 1s 0.15s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.85rem;
+    font-weight: 400;
+    color: var(--white);
+    line-height: 1.35;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 em {
+    color: var(--rose);
+    font-style: italic;
+  }
+
+  .hero p {
+    font-size: 1.02rem;
+    color: var(--text);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.8;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 48px;
+    height: 1px;
+    background: var(--rose);
+    margin: 48px auto;
+    opacity: 0.4;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rose);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .section p {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 12px;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  /* ── STEPS ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(232,164,164,0.06);
+  }
+
+  .step-item:last-child { border-bottom: none; }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--rose-soft);
+    color: var(--rose);
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .step-text { flex: 1; }
+
+  .step-text strong {
+    color: var(--white);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+  }
+
+  .step-text span {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight-box {
+    background: var(--card);
+    border: 1px solid rgba(232,164,164,0.1);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin: 28px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .highlight-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--rose), transparent);
+  }
+
+  .highlight-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+
+  .highlight-box p {
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 8px;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  .highlight-box p:last-child { margin-bottom: 0; }
+
+  /* ── TIERS ── */
+  .tiers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .tier-card {
+    background: var(--card);
+    border: 1px solid rgba(232,164,164,0.08);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .tier-card:hover {
+    border-color: rgba(232,164,164,0.2);
+    transform: translateY(-2px);
+  }
+
+  .tier-card.centurion {
+    border-color: rgba(212,168,83,0.2);
+    background: linear-gradient(135deg, var(--card) 0%, rgba(212,168,83,0.04) 100%);
+  }
+
+  .tier-card.centurion:hover { border-color: rgba(212,168,83,0.4); }
+
+  .tier-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .tier-card.centurion .tier-title { color: var(--gold); }
+
+  .tier-sub {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .tier-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--rose);
+    margin-bottom: 4px;
+  }
+
+  .tier-card.centurion .tier-amount { color: var(--gold); }
+
+  .tier-detail {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  /* ── BENEFIT LIST ── */
+  .benefits { margin: 20px 0; }
+
+  .benefit {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+  }
+
+  .benefit-icon {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rose);
+    margin-top: 8px;
+  }
+
+  .benefit-text {
+    font-size: 0.92rem;
+    color: var(--text);
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    margin-top: 64px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(232,164,164,0.06);
+    animation: fadeUp 0.8s 0.6s ease both;
+  }
+
+  .footer .brand-block .brand-mark { font-size: 1.6rem; margin-bottom: 0; }
+  .footer .brand-block .brand-sub { font-size: 0.58rem; margin-bottom: 16px; }
+
+  .footer .legal {
+    font-size: 0.7rem;
+    color: var(--white);
+    margin-top: 40px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 520px) {
+    .container { padding: 36px 18px 56px; }
+
+    .lang-toggle { margin-bottom: 28px; }
+    .lang-btn { font-size: 0.65rem; padding: 6px 13px; }
+
+    .brand { margin-bottom: 20px; }
+    .brand-mark { font-size: 2.4rem; letter-spacing: 0.12em; }
+    .brand-sub { font-size: 0.62rem; letter-spacing: 0.28em; }
+
+    .hero { margin-bottom: 40px; }
+    .hero h1 { font-size: 1.4rem; line-height: 1.4; margin-bottom: 16px; }
+    .hero p { font-size: 0.92rem; line-height: 1.7; }
+
+    .divider { margin: 36px auto; }
+
+    .section { margin-bottom: 36px; }
+    .section-label { font-size: 0.6rem; margin-bottom: 12px; }
+    .section h2 { font-size: 1.25rem; margin-bottom: 12px; }
+    .section p { font-size: 0.88rem; line-height: 1.7; }
+
+    .steps { margin: 18px 0; }
+    .step-item { gap: 14px; padding: 16px 0; }
+    .step-num { width: 32px; height: 32px; font-size: 0.85rem; }
+    .step-text strong { font-size: 0.88rem; }
+    .step-text span { font-size: 0.8rem; }
+
+    .highlight-box { padding: 22px 18px; margin: 20px 0; border-radius: 12px; }
+    .highlight-box h3 { font-size: 1rem; }
+    .highlight-box p { font-size: 0.85rem; }
+
+    .tiers { grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    .tier-card { padding: 20px 14px; border-radius: 12px; }
+    .tier-title { font-size: 0.9rem; }
+    .tier-sub { font-size: 0.65rem; letter-spacing: 0.15em; margin-bottom: 12px; }
+    .tier-amount { font-size: 1.5rem; }
+    .tier-detail { font-size: 0.72rem; }
+
+    .benefits { margin: 14px 0; }
+    .benefit { gap: 12px; padding: 8px 0; }
+    .benefit-icon { width: 5px; height: 5px; margin-top: 7px; }
+    .benefit-text { font-size: 0.85rem; }
+
+    .footer { margin-top: 48px; padding-top: 32px; }
+    .footer .brand-block .brand-mark { font-size: 1.3rem; }
+    .footer .brand-block .brand-sub { font-size: 0.5rem; }
+    .footer .legal { font-size: 0.65rem; }
+
+    .glow-top { width: 400px; height: 300px; top: -120px; opacity: 0.3; }
+  }
+
+  @media (max-width: 360px) {
+    .container { padding: 28px 14px 48px; }
+    .brand-mark { font-size: 2rem; }
+    .hero h1 { font-size: 1.25rem; }
+    .tiers { grid-template-columns: 1fr; gap: 10px; }
+    .tier-amount { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="glow-top"></div>
+
+<div class="container">
+
+  <!-- LANG TOGGLE -->
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('es')">ES</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('de')">DE</button>
+  </div>
+
+  <!-- BRAND -->
+  <div class="brand">
+    <div class="brand-block">
+      <div class="brand-mark">RED</div>
+      <div class="brand-sub">Network</div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1 id="t-hero-h1"></h1>
+    <p id="t-hero-p"></p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SCHUTZ DURCH NETZWERK -->
+  <div class="section">
+    <div class="section-label" id="t-s1-label"></div>
+    <h2 id="t-s1-h2"></h2>
+    <p id="t-s1-p1"></p>
+    <p id="t-s1-p2"></p>
+  </div>
+
+  <!-- WIE ES FUNKTIONIERT -->
+  <div class="section">
+    <div class="section-label" id="t-s2-label"></div>
+    <h2 id="t-s2-h2"></h2>
+
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong id="t-step1-title"></strong>
+          <span id="t-step1-desc"></span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong id="t-step2-title"></strong>
+          <span id="t-step2-desc"></span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong id="t-step3-title"></strong>
+          <span id="t-step3-desc"></span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <strong id="t-step4-title"></strong>
+          <span id="t-step4-desc"></span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-text">
+          <strong id="t-step5-title"></strong>
+          <span id="t-step5-desc"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TRANSPARENZ -->
+  <div class="section">
+    <div class="section-label" id="t-s3-label"></div>
+    <h2 id="t-s3-h2"></h2>
+    <p id="t-s3-p1"></p>
+  </div>
+
+  <!-- VERGÜTUNG -->
+  <div class="section">
+    <div class="section-label" id="t-s4-label"></div>
+    <h2 id="t-s4-h2"></h2>
+    <p id="t-s4-p1"></p>
+
+    <div class="tiers">
+      <div class="tier-card">
+        <div class="tier-title">Standard</div>
+        <div class="tier-sub" id="t-tier1-sub"></div>
+        <div class="tier-amount">10 €</div>
+        <div class="tier-detail" id="t-tier1-detail"></div>
+      </div>
+      <div class="tier-card centurion">
+        <div class="tier-title">Centurion</div>
+        <div class="tier-sub" id="t-tier2-sub"></div>
+        <div class="tier-amount" id="t-tier2-amount"></div>
+        <div class="tier-detail" id="t-tier2-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTURION -->
+  <div class="section">
+    <div class="highlight-box">
+      <h3 id="t-cent-h3"></h3>
+      <p id="t-cent-p1"></p>
+      <p id="t-cent-p2"></p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- VORTEILE -->
+  <div class="section">
+    <div class="section-label" id="t-s5-label"></div>
+    <h2 id="t-s5-h2"></h2>
+
+    <div class="benefits" id="t-benefits"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="brand-block">
+      <div class="brand-mark">RED</div>
+      <div class="brand-sub">Network</div>
+    </div>
+    <p class="legal" id="t-legal"></p>
+  </div>
+
+</div>
+
+<script>
+const T = {
+  es: {
+    heroH1: 'Tu Red. Tu <em>Recompensa</em>. Tu Aporte.',
+    heroP: 'En la profesión más antigua del mundo nunca falta la oferta — pero siempre faltan los contactos adecuados. Sin una mediación fiable, las mujeres acaban una y otra vez en manos equivocadas. Con Tus conexiones, eso cambia.',
+    s1Label: 'Por qué RED',
+    s1H2: 'Protección a través de la Red',
+    s1P1: 'Por muy profesionales y comprometidas que sean — sin un entorno seguro, están solas. RED es el primer concierge en el oficio más antiguo del mundo y apoya a sus miembros ofreciéndoles contacto con clientes, organización y traslado seguro con drivers propios, un protocolo de seguridad que puede activarse en cualquier momento — y soporte más allá del día a día ante los retos cotidianos. Todo ello bajo absoluta discreción.',
+    s1P2: 'Como QR-Code Holder, Tú eres el puente decisivo: conectas a personas que de otro modo nunca se habrían encontrado — y das a las mujeres la posibilidad de ejercer su actividad en un marco protegido.',
+    s2Label: 'Cómo funciona',
+    s2H2: 'Un QR-Code. Tu móvil. Listo.',
+    step1Title: 'Recibes Tu QR-Code personal',
+    step1Desc: 'Como Wallet Pass directamente en Tu móvil. Siempre contigo, siempre listo — basta un toque.',
+    step2Title: 'Alguien escanea Tu código',
+    step2Desc: 'Muestras Tu móvil, el interesado escanea — y queda registrado automáticamente en RED. Se asigna a Tu código de forma permanente. Un solo escaneo basta.',
+    step3Title: 'El sistema lo reconoce y lo registra todo',
+    step3Desc: 'Tu escaneo queda registrado. Principio First-Touch: quien escanea primero, se queda con el contacto.',
+    step4Title: 'Tu nuevo miembro reserva un encuentro',
+    step4Desc: 'En cuanto se produce un encuentro, el sistema lo registra — y lo asocia a Ti.',
+    step5Title: 'Tu recompensa',
+    step5Desc: 'Por cada nuevo miembro que hayas captado, recibes Tu compensación en el primer encuentro. Calculada automáticamente, visible de forma transparente.',
+    s3Label: 'Control total',
+    s3H2: 'Tu Dashboard. Tu Transparencia.',
+    s3P1: 'A través de Tu portal personal de miembros puedes ver en todo momento qué está pasando: qué nuevos miembros se han reunido con nuestras miembros — y todo gracias a Tu iniciativa.',
+    s4Label: 'Ingresos',
+    s4H2: 'Tus posibilidades en la Red',
+    s4P1: 'Empezarás con 10 € por cada nuevo miembro captado que se reúna con una de nuestras miembros — y tienes la oportunidad de desarrollarte hasta Centurion, lo que puede reportarte hasta 30 € por cada nuevo miembro y encuentro. Un ingreso extra completamente legal, que solo requiere una cosa: Tu móvil con el QR-Code en el lugar adecuado y en el momento oportuno.',
+    tier1Sub: 'Miembro',
+    tier1Detail: 'por nuevo miembro & encuentro<br>QR-Code propio<br>Dashboard propio',
+    tier2Sub: 'VIP Miembro',
+    tier2Amount: 'hasta 30 €',
+    tier2Detail: 'por nuevo miembro & encuentro<br>+ Primas de equipo<br>+ Equipo propio',
+    centH3: 'Centurion — Crea Tu propio equipo',
+    centP1: 'Si tienes un éxito especial, puedes ascender a Centurion y crear Tu propio equipo. Captas miembros para la red, cada miembro recibe su propio QR-Code — y Tú te beneficias de las primas de equipo en cada encuentro de Tu equipo.',
+    centP2: 'Miembros captan miembros — y Tú te beneficias de la fuerza de Tu red. Cuanto mayor sea Tu equipo, mayor será Tu participación.',
+    s5Label: 'De un vistazo',
+    s5H2: 'Lo que recibes',
+    benefits: [
+      'QR-Code personal como Wallet Pass — siempre en Tu móvil',
+      'Principio First-Touch — un escaneo y el nuevo miembro es Tuyo',
+      'Transparencia total sobre escaneos, encuentros y Tus primas',
+      'Primas de 10–30 € por nuevo miembro y encuentro',
+      '100 % legal — Tú conectas personas, nada más',
+      'Ayudas a las mujeres a trabajar de forma segura y protegida',
+      'Ascenso a Centurion: crear Tu propio equipo y beneficiarte de las primas de equipo',
+      'Sin riesgo, sin costes previos — solo necesitas Tu móvil'
+    ],
+    legal: 'Confidencial — Solo para miembros invitados'
+  },
+  en: {
+    heroH1: 'Your Network. Your <em>Reward</em>. Your Contribution.',
+    heroP: 'In the world\'s oldest profession, there\'s never a shortage of supply — but always a shortage of the right connections. Without reliable intermediaries, women end up in the wrong hands time and again. With Your connections, You change that.',
+    s1Label: 'Why RED',
+    s1H2: 'Protection Through Network',
+    s1P1: 'No matter how professional and dedicated the women are — without a safe environment, they\'re on their own. RED is the first concierge in the world\'s oldest trade, supporting its members through client introductions, organised and secure transfers by dedicated drivers, a security protocol that can be activated at any time — and support beyond the everyday with real-life challenges. All under absolute discretion.',
+    s1P2: 'As a QR-Code Holder, You provide the decisive bridge: You connect people who would otherwise never have met — and give the women the opportunity to pursue their business in a protected setting.',
+    s2Label: 'How it works',
+    s2H2: 'One QR Code. Your Phone. Done.',
+    step1Title: 'You receive Your personal QR Code',
+    step1Desc: 'As a Wallet Pass straight to Your phone. Always with You, always ready — one tap is all it takes.',
+    step2Title: 'Someone scans Your code',
+    step2Desc: 'You show Your phone, the prospect scans — and is automatically registered with RED. They are permanently assigned to Your code. One scan is all it takes.',
+    step3Title: 'The system recognises and records everything',
+    step3Desc: 'Your scan is registered. First-Touch Principle: whoever scans first is assigned the contact.',
+    step4Title: 'Your new member books a meeting',
+    step4Desc: 'As soon as a meeting takes place, the system registers it — and assigns it to You.',
+    step5Title: 'Your reward',
+    step5Desc: 'For every new member You\'ve referred, You receive Your compensation upon their first meeting. Automatically calculated, transparently visible.',
+    s3Label: 'Full control',
+    s3H2: 'Your Dashboard. Your Transparency.',
+    s3P1: 'Through Your personal member portal, You can see at any time exactly what\'s happening: which new members have met with our members — all thanks to Your initiative.',
+    s4Label: 'Earnings',
+    s4H2: 'Your Opportunities in the Network',
+    s4P1: 'You\'ll start at 10 € per recruited new member who meets with one of our members — and You have the chance to develop into a Centurion member, which can bring You up to 30 € per new member and meeting. A completely legal side income that requires just one thing: Your phone with the QR Code in the right place at the right time.',
+    tier1Sub: 'Member',
+    tier1Detail: 'per new member & meeting<br>Own QR Code<br>Own Dashboard',
+    tier2Sub: 'VIP Member',
+    tier2Amount: 'up to 30 €',
+    tier2Detail: 'per new member & meeting<br>+ Team bonuses<br>+ Own team',
+    centH3: 'Centurion — Build Your Own Team',
+    centP1: 'If You\'re particularly successful, You can rise to Centurion and build Your own team. You recruit members for the network, each member gets their own QR Code — and You benefit from team bonuses on every meeting Your team generates.',
+    centP2: 'Members recruit members — and You benefit from the power of Your network. The bigger Your team, the bigger Your share.',
+    s5Label: 'At a glance',
+    s5H2: 'What You Get',
+    benefits: [
+      'Personal QR Code as Wallet Pass — always on Your phone',
+      'First-Touch Principle — one scan and the new member is Yours',
+      'Full transparency over scans, meetings and Your bonuses',
+      'Bonuses of 10–30 € per new member and meeting',
+      '100 % legal — You connect people, nothing more',
+      'You help the women work safely and protected',
+      'Centurion promotion: build Your own team and benefit from team bonuses',
+      'No risk, no upfront costs — You only need Your phone'
+    ],
+    legal: 'Confidential — For invited members only'
+  },
+  de: {
+    heroH1: 'Dein Netzwerk. Dein <em>Verdienst</em>. Dein Beitrag.',
+    heroP: 'In der ältesten Branche der Welt fehlt es nie an Angebot — aber immer an den richtigen Kontakten. Ohne verlässliche Vermittlung geraten die Damen immer wieder in falsche Hände. Mit Deinen Connections änderst Du das.',
+    s1Label: 'Warum RED',
+    s1H2: 'Schutz durch Netzwerk',
+    s1P1: 'Egal wie professionell und engagiert die Damen arbeiten — ohne ein sicheres Umfeld bleiben sie auf sich allein gestellt. RED ist der erste Concierge im ältesten Gewerbe der Welt und unterstützt seine Mitgliederinnen durch Kontakte zu Kunden, die Organisation und den sicheren Geleit durch eigene Driver, durch einen Sicherheitsprozess der zu jedem Zeitpunkt aktiviert werden kann — und stellt auch außerhalb des Alltags Support bei alltäglichen Herausforderungen. Und das alles bei Einhaltung absoluter Diskretion.',
+    s1P2: 'Als QR-Code Holder sorgst Du für die entscheidende Brücke: Du bringst Menschen zusammen, die sich sonst nie begegnet wären — und gibst den Damen die Möglichkeit, ihrem Business in einem protektiven Rahmen nachzugehen.',
+    s2Label: 'So funktioniert\'s',
+    s2H2: 'Ein QR-Code. Dein Handy. Fertig.',
+    step1Title: 'Du bekommst Deinen persönlichen QR-Code',
+    step1Desc: 'Als Wallet Pass direkt auf Deinem Handy. Immer dabei, immer bereit — ein Fingertipp genügt.',
+    step2Title: 'Jemand scannt Deinen Code',
+    step2Desc: 'Du zückst Dein Handy, der Interessent scannt — und ist automatisch bei RED registriert. Er wird permanent Deinem Code zugeordnet. Einmal scannen reicht.',
+    step3Title: 'Das System erkennt und merkt sich alles',
+    step3Desc: 'Dein Scan wird registriert. First-Touch-Prinzip: Wer zuerst scannt, dem wird der Kontakt zugeordnet.',
+    step4Title: 'Dein neues Mitglied bucht ein Treffen',
+    step4Desc: 'Sobald tatsächlich ein Treffen zustande kommt, wird das im System registriert — und Dir zugeordnet.',
+    step5Title: 'Dein Dank',
+    step5Desc: 'Für jedes vermittelte neue Mitglied erhältst Du beim ersten Treffen Deine Vergütung. Automatisch berechnet, transparent einsehbar.',
+    s3Label: 'Volle Kontrolle',
+    s3H2: 'Dein Dashboard. Deine Transparenz.',
+    s3P1: 'Über Dein persönliches Mitglieder-Portal siehst Du jederzeit genau, was passiert: Welche neuen Mitglieder sich mit unseren Mitgliederinnen getroffen haben — und das Dank Deiner Initiative.',
+    s4Label: 'Verdienst',
+    s4H2: 'Deine Möglichkeiten im Netzwerk',
+    s4P1: 'Starten wirst Du mit 10 € pro geworbenem neuen Mitglied, welches sich mit einer unserer Mitgliederinnen trifft — und Du hast die Chance, Dich bis zum Centurion-Mitglied zu entwickeln, das Dir bis zu 30 € je neuem Mitglied und Treffen bringen kann. Ein völlig legaler Nebenverdienst, der nur eines erfordert: Dein Handy mit dem QR-Code zur richtigen Zeit am richtigen Ort.',
+    tier1Sub: 'Mitglied',
+    tier1Detail: 'pro neuem Mitglied & Treffen<br>Eigener QR-Code<br>Eigenes Dashboard',
+    tier2Sub: 'VIP Mitglied',
+    tier2Amount: 'bis 30 €',
+    tier2Detail: 'pro neuem Mitglied & Treffen<br>+ Team-Prämien<br>+ Eigenes Team',
+    centH3: 'Centurion — Baue Dein eigenes Team',
+    centP1: 'Wenn Du besonders erfolgreich bist, kannst Du zum Centurion aufsteigen und Dein eigenes Team aufbauen. Du wirbst Mitglieder fürs Netzwerk, jedes Mitglied bekommt seinen eigenen QR-Code — und Du profitierst von den Team-Prämien bei jedem Treffen Deines Teams.',
+    centP2: 'Mitglieder werben Mitglieder — und Du profitierst von der Kraft Deines Netzwerks. Je größer Dein Team, desto größer Dein Anteil.',
+    s5Label: 'Auf einen Blick',
+    s5H2: 'Was Du bekommst',
+    benefits: [
+      'Persönlicher QR-Code als Wallet Pass — immer auf Deinem Handy',
+      'First-Touch-Prinzip — ein Scan und das neue Mitglied gehört Dir',
+      'Volle Transparenz über Scans, Treffen und Deine Prämien',
+      'Prämien von 10–30 € pro neuem Mitglied und Treffen',
+      '100 % legal — Du vermittelst Kontakte, mehr nicht',
+      'Du hilfst den Damen, sicher und geschützt zu arbeiten',
+      'Centurion-Aufstieg: Eigenes Team aufbauen und von Team-Prämien profitieren',
+      'Kein Risiko, keine Vorabkosten — Du brauchst nur Dein Handy'
+    ],
+    legal: 'Vertraulich — Nur für eingeladene Mitglieder'
+  }
+};
+
+function setLang(lang) {
+  var t = T[lang];
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.textContent.trim().toLowerCase() === lang);
+  });
+
+  document.getElementById('t-hero-h1').innerHTML = t.heroH1;
+  document.getElementById('t-hero-p').textContent = t.heroP;
+
+  document.getElementById('t-s1-label').textContent = t.s1Label;
+  document.getElementById('t-s1-h2').textContent = t.s1H2;
+  document.getElementById('t-s1-p1').textContent = t.s1P1;
+  document.getElementById('t-s1-p2').textContent = t.s1P2;
+
+  document.getElementById('t-s2-label').textContent = t.s2Label;
+  document.getElementById('t-s2-h2').textContent = t.s2H2;
+
+  document.getElementById('t-step1-title').textContent = t.step1Title;
+  document.getElementById('t-step1-desc').textContent = t.step1Desc;
+  document.getElementById('t-step2-title').textContent = t.step2Title;
+  document.getElementById('t-step2-desc').textContent = t.step2Desc;
+  document.getElementById('t-step3-title').textContent = t.step3Title;
+  document.getElementById('t-step3-desc').textContent = t.step3Desc;
+  document.getElementById('t-step4-title').textContent = t.step4Title;
+  document.getElementById('t-step4-desc').textContent = t.step4Desc;
+  document.getElementById('t-step5-title').textContent = t.step5Title;
+  document.getElementById('t-step5-desc').textContent = t.step5Desc;
+
+  document.getElementById('t-s3-label').textContent = t.s3Label;
+  document.getElementById('t-s3-h2').textContent = t.s3H2;
+  document.getElementById('t-s3-p1').textContent = t.s3P1;
+
+  document.getElementById('t-s4-label').textContent = t.s4Label;
+  document.getElementById('t-s4-h2').textContent = t.s4H2;
+  document.getElementById('t-s4-p1').textContent = t.s4P1;
+
+  document.getElementById('t-tier1-sub').textContent = t.tier1Sub;
+  document.getElementById('t-tier1-detail').innerHTML = t.tier1Detail;
+  document.getElementById('t-tier2-sub').textContent = t.tier2Sub;
+  document.getElementById('t-tier2-amount').textContent = t.tier2Amount;
+  document.getElementById('t-tier2-detail').innerHTML = t.tier2Detail;
+
+  document.getElementById('t-cent-h3').textContent = t.centH3;
+  document.getElementById('t-cent-p1').textContent = t.centP1;
+  document.getElementById('t-cent-p2').textContent = t.centP2;
+
+  document.getElementById('t-s5-label').textContent = t.s5Label;
+  document.getElementById('t-s5-h2').textContent = t.s5H2;
+
+  var bEl = document.getElementById('t-benefits');
+  bEl.innerHTML = '';
+  t.benefits.forEach(function(txt) {
+    var d = document.createElement('div');
+    d.className = 'benefit';
+    d.innerHTML = '<div class="benefit-icon"></div><div class="benefit-text">' + txt + '</div>';
+    bEl.appendChild(d);
+  });
+
+  document.getElementById('t-legal').textContent = t.legal;
+}
+
+setLang('es');
+</script>
+</body>
+</html>
